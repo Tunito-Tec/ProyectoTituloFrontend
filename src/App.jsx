@@ -9,75 +9,59 @@ import AuxiliarLayout from "./layouts/AuxiliarLayout";
 import NotaryLayout from "./layouts/NotaryLayout";
 import AdminLayout from "./layouts/AdminLayout";
 
-// Páginas Públicas
+// Páginas públicas
 import LandingPage from "./pages/public/LandingPage";
 import Login from "./pages/public/Login";
 import Register from "./pages/public/Register";
 
-// Páginas Cliente
+// Páginas cliente
 import ClientDashboard from "./pages/client/Dashboard";
 import NewProceeding from "./pages/client/NewProceeding";
 import ProceedingDetail from "./pages/client/ProceedingDetail";
 import Profile from "./pages/client/Profile";
 
-// Páginas Auxiliar
+// Páginas auxiliar
 import AuxiliarDashboard from "./pages/auxiliary/Dashboard";
 import ProceedingList from "./pages/auxiliary/ProceedingList";
 import ProceedingReview from "./pages/auxiliary/ProceedingReview";
 
-// Páginas Notario
+// Páginas notario
 import NotaryDashboard from "./pages/notary/Dashboard";
 import PendingSignatures from "./pages/notary/PendingSignatures";
 import SignDocument from "./pages/notary/SignDocument";
+import DeliverableDocuments from "./pages/notary/DeliverableDocuments";
 
-// Páginas Admin
+// Páginas admin
 import AdminDashboard from "./pages/admin/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import TramiteTypeManagement from "./pages/admin/TramiteTypeManagement";
 
+// ── Protected route ────────────────────────────────────────
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
-  console.log(
-    "🛡️ ProtectedRoute - loading:",
-    loading,
-    "user:",
-    user,
-    "allowedRoles:",
-    allowedRoles,
-  );
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!user) {
-    console.log("🚫 No hay usuario, redirigiendo a login");
-    return <Navigate to="/login" />;
-  }
+  if (loading) return <LoadingSpinner />;
+  if (!user) return <Navigate to="/login" replace />;
 
   if (allowedRoles && !allowedRoles.includes(user.rol)) {
-    console.log("🚫 Rol no autorizado:", user.rol, "requerido:", allowedRoles);
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
 
-  console.log("✅ Acceso permitido");
   return children;
 };
 
-function App() {
-  console.log("🏠 App renderizando");
-
+// ── App ────────────────────────────────────────────────────
+export default function App() {
   return (
     <Routes>
-      {/* Rutas Públicas */}
+      {/* ── Público ── */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Route>
 
-      {/* Rutas Cliente */}
+      {/* ── Cliente ── */}
       <Route
         path="/cliente"
         element={
@@ -92,7 +76,7 @@ function App() {
         <Route path="perfil" element={<Profile />} />
       </Route>
 
-      {/* Rutas Auxiliar */}
+      {/* ── Auxiliar ── */}
       <Route
         path="/auxiliar"
         element={
@@ -106,7 +90,7 @@ function App() {
         <Route path="tramites/:id/revisar" element={<ProceedingReview />} />
       </Route>
 
-      {/* Rutas Notario */}
+      {/* ── Notario ── */}
       <Route
         path="/notario"
         element={
@@ -118,9 +102,13 @@ function App() {
         <Route path="dashboard" element={<NotaryDashboard />} />
         <Route path="firmas-pendientes" element={<PendingSignatures />} />
         <Route path="tramites/:id/firmar" element={<SignDocument />} />
+        <Route
+          path="documentos-entregables"
+          element={<DeliverableDocuments />}
+        />
       </Route>
 
-      {/* Rutas Admin */}
+      {/* ── Admin ── */}
       <Route
         path="/admin"
         element={
@@ -134,10 +122,8 @@ function App() {
         <Route path="tipos-tramite" element={<TramiteTypeManagement />} />
       </Route>
 
-      {/* Ruta por defecto */}
-      <Route path="*" element={<Navigate to="/" />} />
+      {/* ── Fallback ── */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
-
-export default App;
